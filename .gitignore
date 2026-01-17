@@ -1,0 +1,14 @@
+# Ignore Python junk
+__pycache__/
+*.pyc
+
+# Ignore Database files (if any generated locally)
+*.db
+*.sqlite3
+
+# Ignore Environment variables (Safety)
+.env
+
+# Ignore OS files
+.DS_Store
+Thumbs.db

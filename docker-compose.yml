@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # 1. The Ledger (Database)
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: nexus_bank
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  # 2. The Brain (Fraud Engine)
+  aml-engine:
+    build: ./aml-engine
+    ports:
+      - "8081:80"
+
+  # 3. The Interface (Dashboard)
+  dashboard:
+    build: ./dashboard
+    ports:
+      - "8501:8501"
+    depends_on:
+      - db
+      - aml-engine
+    environment:
+      DB_HOST: db
+      DB_PASS: password123
+      
+   # 4. THE GRAPH DB (Neo4j)
+  neo4j:
+    image: neo4j:5-community
+    ports:
+      - "7474:7474" # HTTP Browser UI
+      - "7687:7687" # Bolt Protocol (for Python)
+    environment:
+      NEO4J_AUTH: neo4j/password123
+      NEO4J_PLUGINS: '["apoc", "graph-data-science"]' # Powerful graph algorithms
